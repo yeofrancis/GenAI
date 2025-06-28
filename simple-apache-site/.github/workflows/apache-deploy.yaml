@@ -44,4 +44,3 @@ jobs:
       run: |
         curl -I http://localhost | grep "200 OK"
 
-#/*******  3cd17ea4-c5d9-4246-b5ed-af0f9ce8c0ff  *******/
