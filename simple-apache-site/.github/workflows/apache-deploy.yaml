@@ -1,0 +1,47 @@
+#/*************  ✨ Windsurf Command ⭐  *************/
+name: Deploy Apache Web Server
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Cache apt packages
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-apt-${{ hashFiles('**/apache-deploy.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-apt-
+
+    - name: Set up Apache
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y apache2
+
+    - name: Clean default Apache files
+      run: sudo rm -rf /var/www/html/*
+
+    - name: Deploy website
+      run: |
+        set -e
+        sudo cp -r ./public_html/* /var/www/html/
+        sudo systemctl restart apache2
+
+    - name: Verify deployment
+      run: |
+        curl -I http://localhost | grep "200 OK"
+
+#/*******  3cd17ea4-c5d9-4246-b5ed-af0f9ce8c0ff  *******/
